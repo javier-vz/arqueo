@@ -116,3 +116,36 @@ Para las cifras FINALES del paper, editar al inicio de `02_reanalisis_modelos.py
 `N_ESTIMATORS = 100`, `MAX_DEPTH = None` (necesita ~8+ GB de RAM), y repetir con
 `BLOCK_M` en {1000, 2000, 4000} para la sensibilidad (los checkpoints se separan por bloque).
 
+
+## Actualización v4 — Procedencia auditada desde datos primarios
+
+Rastreando la metodología de la tesis (§5.2–5.3) contra los archivos de la carpeta, se
+recuperó la **cadena de construcción completa** del Modelo 2 y se añadió su auditoría:
+
+- **`datos/geodatos/`** — los insumos primarios que la tesis declara: `DEM_vallebajo.tif`
+  (IGN, ~31 m), `Acequias_antiguas.shp` (19 trazas, prospección Fernandini 2022),
+  `Rios_vallebajoCanete.shp` (860 líneas, cartografía ANA), `Valle_bajo_Canete.shp` y
+  `Sitios_Williams_Merino_shape.shp` (120 puntos). Todo en EPSG:32718 (UTM 18S).
+- **`scripts/00_verificacion_procedencia.py`** (VALIDADO ✓, ~2-3 min): recalcula cada
+  variable desde el crudo y la compara con la grilla. Resultado: **acuerdo perfecto**
+  (corr=1.0000, error 0) en altitud, dist_acequia, dist_rio y dist_sitio, y coincidencia
+  100% de las etiquetas reconstruidas (buffer 30 m sobre los 188 sitios) en las 620,296
+  celdas. El paper puede afirmar reproducibilidad desde datos primarios.
+
+### Trazabilidad de nombres (tesis → archivo → estado)
+| La tesis dice | Archivo real | Estado |
+|---|---|---|
+| grilla_codigo2.csv (§5.3, Modelo 2) | datos/grilla_modelo2_620k.csv.gz | ✓ verificado desde crudo |
+| **grilla_codigo1.csv (§5.3, Modelo 1)** | — | **FALTA: buscar en Drive/Colab con ese nombre exacto** |
+| DEM del IGN "50 m" | geodatos/DEM_vallebajo.tif | ✓ (resolución real ~31 m — corregir en el paper) |
+| acequias Fernandini 2022 | geodatos/Acequias_antiguas.shp | ✓ |
+| ríos (ANA) | geodatos/Rios_vallebajoCanete.shp | ✓ |
+| etiqueta "por intersección de celda" | código: buffer de 30 m | discrepancia texto-código, documentada |
+| "filtro de exclusión de 15 m" | — | no existe en ningún código; eliminar o implementar |
+| fuentes de sitios (W y M.xlsx, mincul.xlsx, puntos.csv) | — | faltan los crudos; sitios_unificados_188.csv es el consolidado |
+
+Cadena intermedia disponible en la carpeta original (no incluida aquí por peso, 1,175,331
+celdas cada una): grilla_utm_50m → grilla_con_altura_pendiente → grilla_etiquetada_con_sitios
+→ grilla_con_distancias_agua_y_sitios → grilla_codigo2 (620,296 tras eliminar celdas sin DEM).
+
+Nuevo orden de ejecución: 00 (opcional, auditoría) → 01 → 02 → 03 → 04.

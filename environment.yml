@@ -10,3 +10,6 @@ dependencies:
   - matplotlib>=3.9
   - scipy
   - openpyxl
+  - geopandas
+  - rasterio
+  - shapely>=2
