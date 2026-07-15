@@ -24,13 +24,15 @@ paper_canete/
 │   │                                      sitio_no_alertado_independiente (3).
 │   ├── sitios_unificados_188.csv         Sitios usados para etiquetar (MINCUL + Williams-Merino + campo).
 │   └── predicciones_spatial_cv.csv.gz    Probabilidades fuera-de-bloque del CV espacial (corrida previa).
-├── notebooks/                     EJECUTAR EN ORDEN desde esta carpeta:
-│   ├── 01_diagnostico_fuga.ipynb         Demuestra las dos fugas con los datos (2-4 min). VALIDADO ✓
-│   ├── 02_reanalisis_modelos.ipynb       Evaluación corregida: SMOTE-en-train, CV espacial por bloques,
-│   │                                      precisión@K, baselines no-ML (5-8 min; checkpoints por fold).
-│   ├── 03_validacion_campo.ipynb         Trazabilidad, IC Wilson, Fisher, AUC de campo=0.80 (<1 min). VALIDADO ✓
-├── scripts/
-│   └── reanalisis_canete.py              Todo el pipeline en un script (para el repositorio del paper).
+├── scripts/                       EJECUTAR EN ORDEN (ver instrucciones abajo):
+│   ├── comun.py                          Utilidades compartidas (rutas, distancias, Wilson).
+│   ├── 01_diagnostico_fuga.py            Las dos fugas demostradas con los datos (~2-3 min). VALIDADO ✓
+│   ├── 02_reanalisis_modelos.py          Evaluación honesta: SMOTE-en-train, CV espacial, precisión@K,
+│   │                                      baselines (~5 min; RESUMIBLE por checkpoints). VALIDADO ✓
+│   ├── 03_validacion_campo.py            Trazabilidad, Wilson, Fisher, AUC campo=0.80 (<30 s). VALIDADO ✓
+│   └── 04_modelo1_reconstruido.py        Modelo 1 reconstruido y corregido (~1-2 min). VALIDADO ✓
+├── environment.yml                Entorno Anaconda (conda env create -f environment.yml).
+├── salidas/                       Aquí escriben los scripts: figuras, tablas, predicciones.
 └── figuras_preview/
     ├── fig_fuga_dist_sitio.png           El histograma de la tautología de los 30 m.
     └── fig_auc_campo.png                 Probabilidad vs resultado de campo (AUC=0.80).
@@ -76,8 +78,8 @@ paper_canete/
   `presencia_sitio_total`) sigue irrecuperable.
 - **`datos/grilla_modelo1_250m_rec.csv`**: grilla del M1 (celdas de **250 m** — dato nuevo
   para Métodos) con etiqueta total **reconstruida** (188 positivos; la original tenía ~169
-  según la matriz de la tesis). Regla documentada en el notebook 04.
-- **`notebooks/04_modelo1_reconstruido.ipynb`** (VALIDADO ✓): tautología del M1
+  según la matriz de la tesis). Regla documentada en el script 04.
+- **`scripts/04_modelo1_reconstruido.py`** (VALIDADO ✓): tautología del M1
   (separación perfecta en ~148 m para la etiqueta verificable), pipeline original sobre la
   reconstrucción (F1 0.998 — mismo régimen que la tesis, conclusiones insensibles a la versión
   de la etiqueta) y evaluación corregida (solo terreno, spatial CV: PR-AUC 0.026,
@@ -114,5 +116,3 @@ Para las cifras FINALES del paper, editar al inicio de `02_reanalisis_modelos.py
 `N_ESTIMATORS = 100`, `MAX_DEPTH = None` (necesita ~8+ GB de RAM), y repetir con
 `BLOCK_M` en {1000, 2000, 4000} para la sensibilidad (los checkpoints se separan por bloque).
 
-Los notebooks de `notebooks/` siguen incluidos y son equivalentes; scripts y notebooks
-comparten los mismos datos y producen los mismos números.
