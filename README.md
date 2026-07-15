@@ -84,3 +84,35 @@ paper_canete/
   precision@85 = 8.2% = 5.6x prevalencia).
 - Los `W y M.xlsx`, `mincul.xlsx`, `puntos.csv` originales siguen pendientes; si aparecen,
   la reconstrucción se reemplaza por la etiqueta exacta en una celda.
+
+## Actualización v3 — Scripts .py + entorno Anaconda (recomendado si Jupyter da problemas)
+
+La carpeta `scripts/` ahora contiene versiones .py de los cuatro análisis, equivalentes a los
+notebooks y VALIDADAS de punta a punta. No requieren Jupyter: solo Anaconda.
+
+### Instalación (una vez, en Anaconda Prompt)
+```
+cd ruta\a\paper_canete
+conda env create -f environment.yml
+conda activate canete
+```
+
+### Ejecución (en orden, desde la carpeta scripts/)
+```
+cd scripts
+python 01_diagnostico_fuga.py        (~2-3 min)
+python 02_reanalisis_modelos.py      (~5 min; RESUMIBLE: si se corta, volver a ejecutar
+                                      y retoma desde el último fold guardado)
+python 03_validacion_campo.py        (<30 s)
+python 04_modelo1_reconstruido.py    (~1-2 min)
+```
+Todos los resultados (figuras PNG, tabla de trazabilidad, predicciones, JSON de métricas)
+se escriben en `salidas/`. `comun.py` contiene las utilidades compartidas; los scripts se
+ejecutan desde `scripts/` (las rutas a `../datos/` se resuelven solas).
+
+Para las cifras FINALES del paper, editar al inicio de `02_reanalisis_modelos.py`:
+`N_ESTIMATORS = 100`, `MAX_DEPTH = None` (necesita ~8+ GB de RAM), y repetir con
+`BLOCK_M` en {1000, 2000, 4000} para la sensibilidad (los checkpoints se separan por bloque).
+
+Los notebooks de `notebooks/` siguen incluidos y son equivalentes; scripts y notebooks
+comparten los mismos datos y producen los mismos números.

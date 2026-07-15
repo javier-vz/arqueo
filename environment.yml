@@ -1,0 +1,12 @@
+name: canete
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scikit-learn
+  - imbalanced-learn
+  - matplotlib>=3.9
+  - scipy
+  - openpyxl
